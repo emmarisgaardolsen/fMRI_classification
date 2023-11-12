@@ -6,6 +6,7 @@ The function is based on the original script created by Emma Olsen and Sirid Wih
 """
 
 from pathlib import Path
+import os 
 import numpy as np
 import pandas as pd
 from nilearn import masking
@@ -35,6 +36,10 @@ def load_prep_events(path):
 
     # add button presses to the event dataframe, using the customised function add_button_presses
     event_df = add_button_presses(event_df)
+    
+    
+    # Remove all IMG_BI events
+    # event_df = event_df[event_df["trial_type"] != "IMG_BI"]
 
     # extract data corresponding to the needed columns only
     event_df = event_df.loc[:, ["onset", "duration", "trial_type"]]
@@ -114,51 +119,50 @@ def change_trial_type(trial_type):
         return "negative"
     elif trial_type in ['IMG_PS', 'IMG_PO']:
         return "positive"
-    elif trial_type == "IMG_BI":
+    elif trial_type in ['IMG_BI']:
         return "IMG_button"
     else:
         return trial_type
 
-def fit_first_level_subject(subject, bids_dir, task="boldinnerspeech", runs=[1, 2, 3, 4, 5, 6], space="MNI152NLin2009cAsym"):
+def fit_first_level_subject(subject, bids_dir, runs=[1, 2, 3, 4, 5, 6], space="MNI152NLin2009cAsym"):
     """
-    Fits a first-level model for a given subject in a BIDS dataset.
+    Fit first level model for one subject.
 
     Parameters
     ----------
     subject : str
-        Subject identifier, e.g., "0102".
+        Subject identifier e.g. "0102".
     bids_dir : Path
         Path to the root of the BIDS directory.
-    task : str
-        Task name in the BIDS dataset.
     runs : list of int
-        List of runs to include in the analysis.
+        List of runs to load.
     space : str
-        Space of the preprocessed data.
-
+        Name of the space of the data to load.
+    
     Returns
     -------
     first_level_model : FirstLevelModel
-        Fitted first-level model for the subject.
+        First level model fitted for one subject.
     """
     
-    bids_func_dir = bids_dir / f"sub-{subject}" / "func"
-    fprep_func_dir = bids_dir / "derivatives" / f"sub-{subject}" / "func"
+    bids_func_dir = os.path.join(bids_dir, f"sub-{subject}", "func")
+    fprep_func_dir = os.path.join(bids_dir, "derivatives", f"sub-{subject}", "func")
 
-    def construct_path(directory, suffix):
-        return [directory / f"sub-{subject}_task-{task}_run-{run}_space-{space}_{suffix}" for run in runs]
+    # Construct file paths
+    fprep_func_paths = [os.path.join(fprep_func_dir, f"sub-{subject}_task-boldinnerspeech_run-{run}_echo-1_space-{space}_desc-preproc_bold.nii.gz") for run in runs]
+    event_paths = [os.path.join(bids_func_dir, f"sub-{subject}_task-boldinnerspeech_run-{run}_echo-1_events.tsv") for run in runs]
+    confounds_paths = [os.path.join(fprep_func_dir, f"sub-{subject}_task-boldinnerspeech_run-{run}_desc-confounds_timeseries.tsv") for run in runs]
+    mask_paths = [os.path.join(fprep_func_dir, f"sub-{subject}_task-boldinnerspeech_run-{run}_space-{space}_desc-brain_mask.nii.gz") for run in runs]
 
-    fprep_func_paths = construct_path(fprep_func_dir, "desc-preproc_bold.nii.gz")
-    event_paths = construct_path(bids_func_dir, "events.tsv")
-    confounds_paths = construct_path(fprep_func_dir, "desc-confounds_timeseries.tsv")
-    mask_paths = construct_path(fprep_func_dir, "desc-brain_mask.nii.gz")
-
+    # Load data
     events = [load_prep_events(path) for path in event_paths]
     confounds = [load_prep_confounds(path) for path in confounds_paths]
     masks = [nib.load(path) for path in mask_paths]
 
+    # Merge masks
     mask_img = masking.intersect_masks(masks, threshold=0.8)
 
+    # Fit first level model
     t_r = int(nib.load(fprep_func_paths[0]).header['pixdim'][4])
     first_level_model = FirstLevelModel(t_r=t_r, mask_img=mask_img, slice_time_ref=0.5, hrf_model="glover", verbose=1)
     first_level_model.fit(fprep_func_paths, events, confounds)
