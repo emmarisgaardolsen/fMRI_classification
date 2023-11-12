@@ -68,11 +68,11 @@ The code cannot be run without access to the raw data which cannot be published 
 │           └── derivatives  <--- Folder containing preprocessed fMRI data (used in analysis)
 │               └── sub-XXXX
 │                   └── anat
-│                       └── sub-0117_acq-T1sequence_run-1_space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz
+│                       └── sub-XXXX_acq-T1sequence_run-1_space-MNI152NLin2009cAsym_desc-brain_mask.nii.gz
 │                   └── figures
 │                   └── func
-│                       └── sub-0117_task-boldinnerspeech_run-1_desc-confounds_timeseries.tsv
-│                       └── sub-0117_task-boldinnerspeech_run-1_echo-1_space-MNI152NLin2009cAsym_desc-preproc_bold.nii.gz
+│                       └── sub-XXXX_task-boldinnerspeech_run-1_desc-confounds_timeseries.tsv
+│                       └── sub-XXXX_task-boldinnerspeech_run-1_echo-1_space-MNI152NLin2009cAsym_desc-preproc_bold.nii.gz
 │                   └── log  
 │               └── sub-XXXX.html <--- report from fMRIPrep explaining all preprocessing steps
 │           └── sub-XXXX     <---- raw fMRI data, not preprocessed. Event-files used for analysis.
