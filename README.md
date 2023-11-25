@@ -32,7 +32,7 @@ python src/plot_sanity_checks_beh.py
 python src/16_Nilearn_InSpe_classification_single_sub.py
 ```
 
-#### Step 6: Plot the searchlight classification results
+### Step 6: Plot the searchlight classification results
 
 Run the notebook `plot_searchlight.ipynb`
 
