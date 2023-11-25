@@ -16,45 +16,26 @@ bash setup_venv.sh
 source venv/bin/activate
 ```
 
-### Step 3: Perform Sanity Checks on brain data
+### Step 3: Fit first level models 
 
-#### Step 3.1: Fit first level models 
+Run the notebook `15_Nilearn_InSpe_univariae_analysis.ipynb`. 
 
-```
-python src/fit_first_level.py
-```
-
-#### Step 3.2: Plot sanity check plots
-
-```
-python src/plot_sanity_checks_brain.py
-```
-
-#### Step 3.3: Behavioral Sanity Checks
+### Step 4: Behavioral Sanity Checks
 
 ```
 python src/plot_sanity_checks_beh.py
 ```
 
-### Step 4: Analyse positive vs negative inner speech
-
-#### Step 4.1: Compute and visualise contrast btw. positive and negative inner speech
+### Step 5: Make the beta map contrast from the fitted model to use for classification and perform searchlight
 
 ```
-python src/contrast_inner_speech.py
+python src/16_Nilearn_InSpe_classification_single_sub.py
 ```
 
-#### Step 4.2: Compute single trial betas for each participant
+#### Step 6: Plot the searchlight classification results
 
-```
-python src/single_trial_betas.py
-```
+Run the notebook `plot_searchlight.ipynb`
 
-#### Step 4.3: Perform searchlight decoding analysis 
-
-```
-python src/run_searchlight_decoding.py
-```
 
 ## Project Organisation
 
